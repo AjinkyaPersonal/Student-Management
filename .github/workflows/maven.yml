@@ -23,13 +23,13 @@ jobs:
       mysql:
         image: mysql:8.0
         env:
-          MYSQL_ROOT_PASSWORD: test
+          MYSQL_ROOT_PASSWORD: Ajinkya
           MYSQL_DATABASE: mysql_crud
 
         ports:
           - 3306:3306
         options: >-
-            --health-cmd="mysqladmin ping -h 127.0.0.1 -ptest"            
+            --health-cmd="mysqladmin ping -h 127.0.0.1 -pAjinkya"            
             --health-interval=10s        
             --health-timeout=5s            
             --health-retries=10
@@ -44,11 +44,16 @@ jobs:
         cache: maven
     - name: Make Maven Wrapper Executable
       run: chmod +x mvnw
+    - name: Check MySQL Connection
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y mysql-client
+        mysql -h 127.0.0.1 -P 3306 -uroot -pAjinkya -e "SHOW DATABASES;"
 
     - name: Build and Test
       env:
-        DB_USERNAME: ${{ secrets.MYSQL_USERNAME }}
-        DB_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+        DB_USERNAME: root
+        DB_PASSWORD: Ajinkya
       run: ./mvnw clean verify
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
