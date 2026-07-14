@@ -6,8 +6,8 @@ services:
     container_name: mysql-db
 
     environment:
-      MYSQL_ROOT_PASSWORD: Ajinkya
-      MYSQL_DATABASE: mysql_crud
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
 
     ports:
       - "3307:3306"
@@ -36,6 +36,8 @@ services:
 
     environment:
       SPRING_PROFILES_ACTIVE: docker
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
 
 volumes:
   mysql-data:
