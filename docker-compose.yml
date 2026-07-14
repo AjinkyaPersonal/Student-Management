@@ -16,14 +16,16 @@ services:
       - mysql-data:/var/lib/mysql
 
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-pAjinkya"]
+      test: [ "CMD-SHELL", "mysqladmin ping -h localhost -p$MYSQL_ROOT_PASSWORD" ]
       interval: 10s
       timeout: 5s
       retries: 10
 
   springboot-app:
 
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
 
     container_name: crud-app
 
@@ -36,6 +38,7 @@ services:
 
     environment:
       SPRING_PROFILES_ACTIVE: docker
+      DB_URL: ${DB_URL}
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
 

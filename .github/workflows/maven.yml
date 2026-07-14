@@ -1,72 +1,69 @@
-# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven
-
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
 name: Springboot CI Pipeline
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     services:
       mysql:
         image: mysql:8.0
         env:
-          MYSQL_ROOT_PASSWORD: Ajinkya
+          MYSQL_ROOT_PASSWORD: test
           MYSQL_DATABASE: mysql_crud
 
         ports:
           - 3306:3306
+
         options: >-
-            --health-cmd="mysqladmin ping -h 127.0.0.1 -pAjinkya"            
-            --health-interval=10s        
-            --health-timeout=5s            
-            --health-retries=10
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -ptest"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
     steps:
-    - name: Checkout Source Code
-      uses: actions/checkout@v4
-    - name: Set up JDK 18
-      uses: actions/setup-java@v4
-      with:
-        java-version: '18'
-        distribution: 'temurin'
-        cache: maven
-    - name: Make Maven Wrapper Executable
-      run: chmod +x mvnw
-    - name: Check MySQL Connection
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y mysql-client
-        mysql -h 127.0.0.1 -P 3306 -uroot -pAjinkya -e "SHOW DATABASES;"
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
 
-    - name: Build and Test
-      env:
-        DB_USERNAME: root
-        DB_PASSWORD: Ajinkya
-      run: ./mvnw clean verify
+      - name: Set up JDK 18
+        uses: actions/setup-java@v4
+        with:
+          java-version: "18"
+          distribution: "temurin"
+          cache: maven
 
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v3
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Make Maven Wrapper Executable
+        run: chmod +x mvnw
 
-    - name: Build Docker Image
-      run: |
-        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/student-management:latest .
+      - name: Check MySQL Connection
+        env:
+          MYSQL_PWD: test
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mysql-client
+          mysql -h 127.0.0.1 -P 3306 -uroot -e "SHOW DATABASES;"
 
-    - name: Push Docker Image
-      run: |
-        docker push ${{ secrets.DOCKERHUB_USERNAME }}/student-management:latest
+      - name: Build and Test
+        env:
+          DB_USERNAME: root
+          DB_PASSWORD: test
+        run: ./mvnw clean verify
 
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build Docker Image
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/student-management:latest .
+
+      - name: Push Docker Image
+        run: |
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/student-management:latest
