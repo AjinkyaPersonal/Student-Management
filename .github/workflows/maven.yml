@@ -78,20 +78,6 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
 
           script: |
-
-            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/student-management:latest
-
-            sudo docker stop student-management || true
-
-            sudo docker rm student-management || true
-
-            sudo docker run -d \
-              --name student-management \
-              --network student-network \
-              -p 8080:8080 \
-              -e SPRING_PROFILES_ACTIVE=docker \
-              -e DB_URL="jdbc:mysql://mysql:3306/mysql_crud?createDatabaseIfNotExist=true" \
-              -e DB_USERNAME=root \
-              -e DB_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }} \
-              --restart unless-stopped \
-              ${{ secrets.DOCKERHUB_USERNAME }}/student-management:latest
+            cd ~/Student-Management
+            sudo docker compose -f docker-compose.prod.yml pull
+            sudo docker compose -f docker-compose.prod.yml up -d
