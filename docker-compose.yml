@@ -2,8 +2,9 @@
 services:
 
   mysql:
+    restart: unless-stopped
     image: mysql:8.0
-    container_name: mysql-db
+    container_name: mysql
 
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
@@ -22,6 +23,7 @@ services:
       retries: 10
 
   springboot-app:
+    restart: unless-stopped
 
     build:
       context: .
